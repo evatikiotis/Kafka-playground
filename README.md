@@ -15,4 +15,4 @@ Read From Kafka topic (Removed in last version) // Comment code,  Lose Tuples ca
 2)Run KafkaMain
 3)Run SecondPassMain
 
-#Upcoming Updates : Resolving Time Issues, New KafkaCosnumer To Connect First and Second Flink Jobs.
+#Upcoming Updates : Resolving Time Issues, New KafkaCosnumer (Connection between first and second Flink jobs).
