@@ -1,7 +1,7 @@
 # SamplingFlink
 
 #Implement Algorithm 1 from: https://arxiv.org/pdf/1909.02629.pdf
-
+#Data Source : https://openaq.org/
  
 Loaded into a Kafka topic (Removed in last version)
 Read From Kafka topic (Removed in last version) // Comment code,  Lose Tuples cause Time events.//  
@@ -15,4 +15,4 @@ Read From Kafka topic (Removed in last version) // Comment code,  Lose Tuples ca
 2)Run KafkaMain
 3)Run SecondPassMain
 
-#Upcoming Updates : Resolving Time Issues, New KafkaCosnumer (Connection between first and second Flink jobs).
+#Upcoming Updates : Resolving Time Issues, New KafkaConsumer (Connection between first and second Flink jobs).
