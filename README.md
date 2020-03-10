@@ -6,13 +6,13 @@
 Loaded into a Kafka topic (Removed in last version)
 Read From Kafka topic (Removed in last version) // Comment code,  Lose Tuples cause Time events.//  
 
---HOW TO RUN :
-Run FirstPAssMain
-Run SecondPassMain
+--How To Run :
+1)Run FirstPAssMain
+2)Run SecondPassMain
 
---HOW TO RUN USING KAFKA:
-Run FirstPassMain
-Run KafkaMain
-Run SecondPassMain
+--How To Run Using Kafka:
+1)Run FirstPassMain
+2)Run KafkaMain
+3)Run SecondPassMain
 
-#Updates soon...
+#Upcoming Updates : Resolving Time Issues, New KafkaCosnumer To Connect First and Second Flink Jobs.
