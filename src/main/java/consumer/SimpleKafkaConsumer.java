@@ -25,7 +25,7 @@ public class SimpleKafkaConsumer {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
         Pattern topicPattern = Pattern.compile(topic);
         consumer.subscribe(topicPattern);
-        ConsumerRecords<String, String> records = consumer.poll( Duration.ofSeconds(10));
+        ConsumerRecords<String, String> records = consumer.poll( Duration.ofSeconds(40));
         records.forEach((each) -> System.out.println(each.key() + " " + each.value()));
 
 
