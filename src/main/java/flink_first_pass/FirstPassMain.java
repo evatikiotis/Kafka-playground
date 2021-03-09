@@ -28,13 +28,19 @@ public class FirstPassMain {
         env.setParallelism(3);
         // Setting the time characteristics for the windows implementation
         env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime); // Setting time characteristics for windowing.
-        /*String bootsrtapServers = "127.0.0.1:9092";
-        String topic = "Other";
+        String bootsrtapServers = "127.0.0.1:9092";
+        String topic = "test";
         Properties properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootsrtapServers);
-        // Add the kafka topic declared above as data source.
-       // DataStream<String> kafkaData = streamEnvironment.addSource(new FlinkKafkaConsumer(topic, new SimpleStringSchema(), properties));*/
-        DataStream<String> kafkaData = env.readTextFile("openaqDataSet.csv");
+        // Add the kafka topic declared above as data source.*/
+
+        FlinkKafkaConsumer<String> flinkKafkaConsumer = new FlinkKafkaConsumer<>(topic, new SimpleStringSchema(), properties);
+        flinkKafkaConsumer.setStartFromEarliest();
+
+        DataStream<String> kafkaData = env.addSource(flinkKafkaConsumer);
+//        DataStream<String> kafkaData = env.readTextFile("openaq.csv");
+
+//        DataStream<String> kafkaData = env.readTextFile("openaqDataSet.csv");
         DataStream<Tuple6<String, String, Double, Double, Double, Integer>> avgVarGamma = getAvgVarGamma(kafkaData);
         DataStream<Tuple2<Double, Integer>> toAggr = sumOfGammas(avgVarGamma);
         DataStream<Tuple3<Double, Integer, Integer>> totalGamma = toAggr.timeWindowAll(Time.seconds(20)).aggregate(new MyAggregate());

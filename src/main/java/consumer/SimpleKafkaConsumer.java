@@ -5,7 +5,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.time.Duration;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -27,7 +26,5 @@ public class SimpleKafkaConsumer {
         consumer.subscribe(topicPattern);
         ConsumerRecords<String, String> records = consumer.poll( Duration.ofSeconds(40));
         records.forEach((each) -> System.out.println(each.key() + " " + each.value()));
-
-
     }
 }

@@ -22,11 +22,11 @@ public class KafkaMain {
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
 //        create the producer
-        KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
+        KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
-        String topic = "test_topic_source_5";
+        String topic = "test";
 
-        String csvFile = "openaqDataSet.csv";
+        String csvFile = "openaq-small-dataset.csv";
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
