@@ -13,7 +13,7 @@ public class SimpleKafkaConsumer {
 
         // Setting the time characteristics for the windows implementation
         String bootsrtapServers = "localhost:9092";
-        String topic = "test";
+        String topic = "population";
         Properties properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootsrtapServers);
         // Add the kafka topic declared above as data source.*/
@@ -24,7 +24,7 @@ public class SimpleKafkaConsumer {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
         Pattern topicPattern = Pattern.compile(topic);
         consumer.subscribe(topicPattern);
-        ConsumerRecords<String, String> records = consumer.poll( Duration.ofSeconds(40));
+        ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(40));
         records.forEach((each) -> System.out.println(each.key() + " " + each.value()));
     }
 }
