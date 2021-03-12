@@ -23,7 +23,7 @@ public class PopulationKafkaConsumer {
 
         // Create Streaming environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(3);
+//        env.setParallelism(3);
         // Setting the time characteristics for the windows implementation
         env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime);
 
@@ -37,11 +37,11 @@ public class PopulationKafkaConsumer {
 
         // add consumer as environment datasource
         DataStream<String> kafkaData = env.addSource(flinkKafkaConsumer);
-        DataStream<Tuple2<String, Long>> avgVarGamma = groupByCountry(kafkaData);
+        DataStream<Tuple2<String, Long>> groupedByCountry = groupByCountry(kafkaData);
 
         // Create a sink for our stream.
-        avgVarGamma.print();
-        avgVarGamma.writeAsText("output_fistPass").setParallelism(1);
+        groupedByCountry.print();
+        groupedByCountry.writeAsText("output_fistPass").setParallelism(1);
         // Execute job
         env.execute("First Pass Job");
     }
@@ -62,9 +62,9 @@ public class PopulationKafkaConsumer {
                     }
                 })
                 .keyBy(0)            // groupBy country and parameter
-                .timeWindow(Time.seconds(10))   // Add a window to compute strata in batches
-                .reduce(new PopulationReducer());          // Reduce. New tuples will be at the format of Country, Parameter, Measurement, Measurement, Measurement, Count
-//                .setParallelism(parallelism)
+                .timeWindow(Time.seconds(2))   // Add a window to compute strata in batches
+                .reduce(new PopulationReducer())        // Reduce. New tuples will be at the format of Country, Parameter, Measurement, Measurement, Measurement, Count
+                .setParallelism(4);
 //                .map(new PopulationMapper());
     }
 
