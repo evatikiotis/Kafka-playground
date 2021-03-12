@@ -1,5 +1,6 @@
 package com.evatikiotis.population;
 
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -11,6 +12,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  Group-by:Country,parameter and Calculate avg ,var, sd , si
@@ -20,6 +22,8 @@ public class PopulationKafkaConsumer {
     public static void main(String[] args) throws Exception {
         final String TOPIC = "custom-population";
         final String BOOTSTRAP_SERVERS = "127.0.0.1:9092";
+        final long startTime = System.currentTimeMillis();
+
 
         // Create Streaming environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -43,7 +47,10 @@ public class PopulationKafkaConsumer {
         groupedByCountry.print();
         groupedByCountry.writeAsText("output_fistPass").setParallelism(1);
         // Execute job
-        env.execute("First Pass Job");
+        JobExecutionResult result = env.execute("My Flink Job");
+        System.out.println("The job took " + result.getNetRuntime(TimeUnit.SECONDS) + " to execute");
+        long endTime = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (endTime-startTime) + "ms");
     }
 
     /**
