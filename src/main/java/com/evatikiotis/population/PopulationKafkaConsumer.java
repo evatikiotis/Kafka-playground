@@ -1,18 +1,11 @@
 package com.evatikiotis.population;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.tuple.Tuple5;
-import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -44,7 +37,7 @@ public class PopulationKafkaConsumer {
 
         // add consumer as environment datasource
         DataStream<String> kafkaData = env.addSource(flinkKafkaConsumer);
-        DataStream<Tuple2<String, Long>> avgVarGamma = getAvgVarGamma(kafkaData);
+        DataStream<Tuple2<String, Long>> avgVarGamma = groupByCountry(kafkaData);
 
         // Create a sink for our stream.
         avgVarGamma.print();
@@ -58,7 +51,7 @@ public class PopulationKafkaConsumer {
      * and we calculate the sum of populations for each country
      *
      */
-    private static DataStream<Tuple2<String, Long>> getAvgVarGamma(DataStream<String> kafkaData) {
+    private static DataStream<Tuple2<String, Long>> groupByCountry(DataStream<String> kafkaData) {
 
         return kafkaData
                 .map(new PopulationSplitter())            // Split data and keep only relevant attributes
