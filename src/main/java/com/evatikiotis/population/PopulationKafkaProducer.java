@@ -20,7 +20,7 @@ public class PopulationKafkaProducer {
         final String TOPIC = "custom-population";
         final String CSV_SPLIT_CHARACTER = ",";
 
-        // create Producer properties
+        // define Producer properties
         Properties properties = new Properties();
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());

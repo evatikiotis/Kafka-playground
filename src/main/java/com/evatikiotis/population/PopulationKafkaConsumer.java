@@ -28,25 +28,23 @@ public class PopulationKafkaConsumer {
         final String TOPIC = "custom-population";
         final String BOOTSTRAP_SERVERS = "127.0.0.1:9092";
 
-
-        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(); // Creating Streaming Environment.
+        // Create Streaming environment
+        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(3);
         // Setting the time characteristics for the windows implementation
-        env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime); // Setting time characteristics for windowing.
+        env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime);
 
+        // define consumer properties
         Properties properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-        // Add the kafka topic declared above as data source.*/
 
+        // define the consumer
         FlinkKafkaConsumer<String> flinkKafkaConsumer = new FlinkKafkaConsumer<>(TOPIC, new SimpleStringSchema(), properties);
         flinkKafkaConsumer.setStartFromEarliest();
 
+        // add consumer as environment datasource
         DataStream<String> kafkaData = env.addSource(flinkKafkaConsumer);
-//        DataStream<String> kafkaData = env.readTextFile("openaq.csv");
-
-//        DataStream<String> kafkaData = env.readTextFile("openaqDataSet.csv");
         DataStream<Tuple2<String, Long>> avgVarGamma = getAvgVarGamma(kafkaData);
-
 
         // Create a sink for our stream.
         avgVarGamma.print();
@@ -56,8 +54,9 @@ public class PopulationKafkaConsumer {
     }
 
     /**
-     * Map to the desired format and filter out negative measurements. After that we group our data by country and
-     * parameter in order to calculate the average, the variance and the gamma per stratum.
+     * Map to the desired format and filter out negative measurements. After that we group our data by country
+     * and we calculate the sum of populations for each country
+     *
      */
     private static DataStream<Tuple2<String, Long>> getAvgVarGamma(DataStream<String> kafkaData) {
 
@@ -76,65 +75,6 @@ public class PopulationKafkaConsumer {
 //                .map(new PopulationMapper());
     }
 
-    /**
-     * substream to calculate total gamma.
-     */
-    private static DataStream<Tuple2<Double, Integer>> sumOfGammas(DataStream<Tuple6<String, String, Double, Double, Double, Integer>> avgVarGamma) {
 
-        return avgVarGamma.map(new MapFunction<Tuple6<String, String, Double, Double, Double, Integer>, Tuple2<Double, Integer>>() {
-            @Override
-            public Tuple2<Double, Integer> map(Tuple6<String, String, Double, Double, Double, Integer> value) throws Exception {
-                return new Tuple2<>(value.f4, value.f5);
-            }
-        });
-    }
-
-    /**
-     * Making a tranformation in order to be able to join the 2 streams
-     */
-    //
-    private static DataStream<Tuple6<String, String, Double, Double, Double, Integer>> joinVarGamma(DataStream<Tuple6<String, String, Double, Double, Double, Integer>> avgVarGamma) {
-
-        return avgVarGamma.map(new MapFunction<Tuple6<String, String, Double, Double, Double, Integer>, Tuple6<String, String, Double, Double, Double, Integer>>() {
-            @Override
-            public Tuple6<String, String, Double, Double, Double, Integer> map(Tuple6<String, String, Double, Double, Double, Integer> value) throws Exception {
-                return new Tuple6<>(value.f0, value.f1, value.f2, value.f3, value.f4, 1);
-            }
-        });
-    }
-
-    /**
-     * final stream Country,params,avg,var,sd, numberOfSumples(si)
-     */
-    private static DataStream<Tuple5<String, String, Double, Double, Integer>> joinStreams(DataStream<Tuple6<String, String, Double, Double, Double, Integer>> avgVarGammaToJoin,
-                                                                                           DataStream<Tuple3<Double, Integer, Integer>> totalGamma){
-        double memoryBudget = 0.01;
-        return avgVarGammaToJoin.join(totalGamma)
-                .where(new KeySelector<Tuple6<String, String, Double, Double, Double, Integer>, Object>() {
-                    @Override
-                    public Object getKey(Tuple6<String, String, Double, Double, Double, Integer> value) throws Exception {
-                        return value.f5;
-                    }
-                })
-                .equalTo(new KeySelector<Tuple3<Double, Integer, Integer>, Object>() {
-                    @Override
-                    public Object getKey(Tuple3<Double, Integer, Integer> value) throws Exception {
-                        return value.f2;
-                    }
-                })
-                .window(TumblingTimeWindows.of(Time.seconds(25)))
-                .apply(new JoinFunction<Tuple6<String, String, Double, Double, Double, Integer>, Tuple3<Double, Integer, Integer>, Tuple5<String, String, Double, Double, Integer>>() {
-                    @Override
-                    public Tuple5<String, String, Double, Double, Integer> join(Tuple6<String, String, Double, Double, Double, Integer> first, Tuple3<Double, Integer, Integer> second) throws Exception {
-                        int si = (int) Math.floor((first.f4 / second.f0) * (second.f1 * memoryBudget));
-                        if (si >= 1.0) {
-                            return new Tuple5<>(first.f0, first.f1, first.f2, first.f3, si);
-                        } else {
-                            return new Tuple5<>(first.f0, first.f1, first.f2, first.f3, 1);
-                        }
-                    }
-                });
-
-    }
 
 }
