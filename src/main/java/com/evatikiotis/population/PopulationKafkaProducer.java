@@ -14,7 +14,7 @@ import java.util.Properties;
 public class PopulationKafkaProducer {
     public static void main(String[] args) throws IOException {
         final String DATASET_FILENAME_AND_EXT = "small-population-dataset.csv";
-        final String BOOTSTRAP_SERVERS = "127.0.0.1:9092";
+        final String BOOTSTRAP_SERVERS = "localhost:9092";
         final String TOPIC = "custom-population";
         final String CSV_SPLIT_CHARACTER = ",";
 
