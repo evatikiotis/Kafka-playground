@@ -9,13 +9,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
-import java.util.Arrays;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class PopulationKafkaProducer {
     public static void main(String[] args) throws IOException {
-        final String DATASET_FILENAME_AND_EXT = "custom-population-dataset.csv";
+        final String DATASET_FILENAME_AND_EXT = "small-population-dataset.csv";
         final String BOOTSTRAP_SERVERS = "127.0.0.1:9092";
         final String TOPIC = "custom-population";
         final String CSV_SPLIT_CHARACTER = ",";
@@ -33,13 +31,17 @@ public class PopulationKafkaProducer {
         BufferedReader br = new BufferedReader(new FileReader(DATASET_FILENAME_AND_EXT));
         // read first line and ignore it
         String line = br.readLine();
-        if(line == null) throw new FileSystemException(DATASET_FILENAME_AND_EXT);
+        if (line == null) {
+            throw new FileSystemException(DATASET_FILENAME_AND_EXT);
+        }
 
         while ((line = br.readLine()) != null) {
             // remove '.' from our line
             line = String.join("", line.split("\\."));
             String[] words = line.split(CSV_SPLIT_CHARACTER);
-            if(words.length != 2) continue;
+            if (words.length != 2) {
+                continue;
+            }
             String key = words[0];
             // produce record in kafka topic and send it
             ProducerRecord<String, String> record = new ProducerRecord(TOPIC, key, line);

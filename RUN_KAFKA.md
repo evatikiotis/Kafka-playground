@@ -19,3 +19,6 @@ kafka-topics --list --zookeeper localhost:2181
 
 #### delete a topic
 kafka-topics --delete --zookeeper localhost:2181 --topic test
+
+#### The example below uses docker ps -q to print the IDs of all containers that have exited (--filter status=exited), and removes those containers with the docker rm command:
+docker rm $(docker ps --filter status=exited -q)
